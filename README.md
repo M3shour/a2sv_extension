@@ -86,4 +86,4 @@ Sit back. The extension automatically pushes your code directly to your GitHub r
 - If you update the extension, reload the unpacked extension and refresh the tab.
 
 ## Repository
-Add your GitHub repository link here.
+ - Repo: https://github.com/apeiron888/a2sv_extension
