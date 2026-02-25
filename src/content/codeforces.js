@@ -114,7 +114,8 @@ import { showToast, showFallbackPanel } from './shared.js';
           { type: 'FETCH_CF_CODE', submissionUrl, contestId, submissionId },
           async (response) => {
             if (chrome.runtime.lastError || response?.error || !response?.code) {
-              showToast('Could not fetch code. Opening fallback...', 'error');
+              const errMsg = response?.error || chrome.runtime.lastError?.message || 'Could not fetch code';
+              showToast(`${errMsg}. Opening fallback...`, 'error');
               showFallbackPanel({
                 trial,
                 time,

@@ -45,7 +45,28 @@ async function fetchCodeforcesCode(submissionUrl, contestId, submissionId) {
   }
   try {
     const response = await fetch(url, { credentials: 'include' });
+    if (!response.ok) {
+      return { error: `Codeforces response ${response.status}` };
+    }
     const html = await response.text();
+
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const sourceNode =
+        doc.querySelector('#program-source-text') ||
+        doc.querySelector('pre.program-source') ||
+        doc.querySelector('pre.prettyprint') ||
+        doc.querySelector('pre');
+      const textareaNode = doc.querySelector('textarea#program-source-text');
+      const textContent = (sourceNode && sourceNode.textContent) || (textareaNode && textareaNode.value);
+      if (textContent && textContent.trim()) {
+        return { code: textContent };
+      }
+    } catch (parseErr) {
+      // fall through to regex parsing
+    }
+
     const match = html.match(/<pre[^>]*id="program-source-text"[^>]*>([\s\S]*?)<\/pre>/i);
     if (match) {
       let text = match[1];
@@ -55,6 +76,7 @@ async function fetchCodeforcesCode(submissionUrl, contestId, submissionId) {
       text = decodeHtmlEntities(text);
       return { code: text };
     }
+
     return { error: 'Code not found' };
   } catch (err) {
     return { error: err.message };
